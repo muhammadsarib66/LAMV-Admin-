@@ -7,7 +7,7 @@ import { TextField } from '@mui/material';
 import { setisMainCatModalClose } from '../features/slicer/Slicer';
 import  {Button}  from '@material-tailwind/react';
 import { toast } from 'react-toastify';
-// import { setisModalOpen } from '../features/slicer/Slicer';
+import { AddMainCatApi } from '../features/slicer/AddNewMainCat';
 const style = {
     position: 'absolute',
     top: '50%',
@@ -21,30 +21,31 @@ const style = {
     p: 4,
 };
 
-export default function AddMainCategoryModal({AddCat}) {
+export default function AddMainCategoryModal() {
     const {isMainCatModal} = useSelector((state)=>state.Slicer);
     const dispatch = useDispatch();
 
     const [addMainCat , setAddMainCat] = useState({
-        mainCategory: '',
-        Brand: '',
+      title: '',
+        
     })
 
     const handleChange = (e)=>{
         setAddMainCat({...addMainCat , [e.target.name] : e.target.value})
-        console.log(addMainCat)
+        // console.log(addMainCat)
     }
 
-const handleAddEmployee = ()=>{
-    if(addMainCat.main === '' || addMainCat.brand === ''){
-        toast.error('Please fill all the fields')
+const handleAddCategory = ()=>{
+    if(addMainCat.title === ''){
+        toast.error('Please fill the fields')
     }
     else{
-        AddCat(addMainCat)
-        console.log(addMainCat)
-        toast.success('Main Category Added')
-        
+      dispatch(AddMainCatApi(addMainCat))
+        // console.log(addMainCat.title)
         dispatch(setisMainCatModalClose())
+        setAddMainCat({
+          title: ''
+        })
     }
 }
 
@@ -66,14 +67,13 @@ const handleAddEmployee = ()=>{
           </Typography>
           <div className="flex flex-col gap-4">
 
-            <TextField value={addMainCat.mainCategory} name="mainCategory" onChange={handleChange} sx={{width : '100%'}} label="main"/>
-            <TextField value={addMainCat.Brand} name="Brand"onChange={handleChange} sx={{width : '100%'}} label="brand "/>
-            <Button onClick={handleAddEmployee}>
-                    Add Employeye
+            <TextField value={addMainCat.title } name="title" onChange={handleChange} sx={{width : '100%'}} label="main Category"/>
+            <Button onClick={handleAddCategory}>
+                    Add Category
             </Button>
           </div>
           </div>
-
+          
         </Box>
       </Modal>
     </div>

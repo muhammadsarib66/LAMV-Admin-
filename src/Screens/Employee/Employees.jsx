@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, TrashIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import {
   Card,
   CardHeader,
@@ -10,18 +10,22 @@ import {
   Chip,
   IconButton,
   Tooltip,
+  Button,
 } from "@material-tailwind/react";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteCustomerApi } from "../features/slicer/DeleteCustomerSlicer";
-import Loader from "../component/Loader";
-import EditCustomerModal from "../component/EditCustomerModal";
-import { setIsCustomerActionModalOpen } from "../features/slicer/Slicer";
-import { getCustomersApi } from "../features/slicer/CustomerSlicer";
+// import { getCustomersApi } from "../features/slicer/CustomerSlicer";
+import { deleteCustomerApi } from "../../features/slicer/DeleteCustomerSlicer";
+import Loader from "../../component/Loader";
+import ActionEmployeeModal from "./ActionEmployeeModal";
+import { setIsEmployeeActionModalOpen, setisModalOpen } from "../../features/slicer/Slicer";
+import { getEmployeeApi } from "../../features/slicer/GetEmployeeSlicer";
+import { DeleteEmployeeApi } from "../../features/slicer/DeleteEmployeeSlicer";
+import AddEmployeeModal from "./AddEmployeeModal";
 
-const Customers = () => {
+const Employees = () => {
   const dispatch = useDispatch();
-  const { getCustomers, isLoading } = useSelector(
-    (state) => state.CustomerSlicer
+  const { getEmpolyees, isLoading } = useSelector(
+    (state) => state.GetEmployeeSlicer
   );
   // const [TableData, setTableData] = useState(getCustomers);
   const [userId, setUserId] = useState("");
@@ -39,18 +43,18 @@ const Customers = () => {
 
   const handleAction = (id) => {
     setUserId(id);
-    dispatch(setIsCustomerActionModalOpen());
+    dispatch(setIsEmployeeActionModalOpen());
   };
 
-  const handleDeleteCustomer = (id) => {
-    dispatch(deleteCustomerApi(id));
+  const handleDeleteEmployee = (id) => {
+    dispatch(DeleteEmployeeApi(id));
   };
 
   useEffect(() => {
     // Fetch customers data when the component mounts
-    dispatch(getCustomersApi());
+    dispatch(getEmployeeApi());
   }, [dispatch]);
-  const filteredCustomers = getCustomers.filter((customer) => {
+  const filteredEmployees = getEmpolyees.filter((customer) => {
     const isMatchFilter =
       filter === "all" ||
       (filter === "active" && customer.isActive === true) ||
@@ -66,16 +70,25 @@ const Customers = () => {
   return (
     <>
       {isLoading && <Loader />}
-      <EditCustomerModal userId={userId} />
+      <AddEmployeeModal  />
+      <ActionEmployeeModal userId={userId}  />
 
       <Card className="h-full w-full mb-10">
         <CardHeader floated={false} shadow={false} className="rounded-none">
           <div className="mb-8 flex items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="blue-gray">
-                Customers
+                Employees List
               </Typography>
             </div>
+            <Button
+                onClick={() => dispatch(setisModalOpen())}
+                className="flex items-center gap-3"
+                size="sm"
+              >
+                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add
+                Employee
+              </Button>
           </div>
           <div className="    "></div>
 
@@ -122,9 +135,9 @@ const Customers = () => {
               </tr>
             </thead>
             <tbody>
-              {getCustomers &&
-                filteredCustomers?.map((item, index) => {
-                  const isLast = index === getCustomers?.length - 1;
+              {getEmpolyees &&
+                filteredEmployees?.map((item, index) => {
+                  const isLast = index === getEmpolyees?.length - 1;
                   const classes = isLast
                     ? "p-4"
                     : "p-4 border-b border-blue-gray-50";
@@ -198,7 +211,7 @@ const Customers = () => {
                         </Tooltip>
                         <Tooltip content="Delete user ">
                           <IconButton
-                            onClick={() => handleDeleteCustomer(item?._id)}
+                            onClick={() => handleDeleteEmployee(item?._id)}
                             variant="text"
                           >
                             <TrashIcon className="text-red-700 h-4 w-4" />
@@ -216,4 +229,4 @@ const Customers = () => {
   );
 };
 
-export default Customers;
+export default Employees;

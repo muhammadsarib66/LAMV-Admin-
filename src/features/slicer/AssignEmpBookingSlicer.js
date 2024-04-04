@@ -12,7 +12,7 @@ export const AssignEmplBookingApi = createAsyncThunk(
         console.log(asignE,'check')
         return await axios.post(`${baseUrl}booking/assign-employee`,asignE,config)
         .then((resp)=>{
-            toast.success(resp.statusText)
+            toast.success(resp.data.message)
             dispatch(getBookingApi())
             console.log(resp.data)
             

@@ -67,7 +67,6 @@ const Booking = () => {
   ];
   const [bookingDetail, setBookingDetail] = useState("");
   const [bookingId, setBookingId] = useState("");
-  const [userId, setUserId] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("active");
 
   const handleStatusChange = (status) => {
@@ -90,9 +89,10 @@ const Booking = () => {
     // Handle other cases, such as 'cancelled', 'completed', etc.
     filteredBookings = [];
   }
-  const handleAsignEmpBooking = (id,user) => {
-    setBookingId(id);
-    setUserId(user)
+  const handleAsignEmpBooking = (item) => {
+    const { bookingId, _id } = item;
+    console.log(bookingId, _id);
+    setBookingId(_id);
     dispatch(setIsAssignEmpModalOpen());
   };
   const handleAddBudget = (id) => {
@@ -101,6 +101,7 @@ const Booking = () => {
   };
   const handleInfoOpen = (item) => {
     setBookingDetail(item);
+    console.log(item);
     dispatch(setIsModalOpen());
   };
   const handleDeleteBooking = (id) => {
@@ -116,7 +117,7 @@ const Booking = () => {
       {isLoading && <Loader />}
       <BookingDetailModal bookingDetail={bookingDetail} />
       <AddBudgetModal BookingID={bookingId} />
-      <AssigEmpBookingModal AssignID={bookingId} userID={userId} />
+      <AssigEmpBookingModal AssignID={bookingId} />
       <Card className="h-full  mb-10">
         <CardHeader floated={false} shadow={false} className="rounded-none">
           <div className="mb-8 flex items-center justify-between gap-8">
@@ -168,7 +169,7 @@ const Booking = () => {
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
                 return (
-                  <tr key={item.index}>
+                  <tr key={index}>
                     <td className={classes}>
                       <div className="flex items-center gap-3">
                         <Typography
@@ -176,7 +177,7 @@ const Booking = () => {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {item?.bookedBy}
+                          {item?._id}
                         </Typography>
                       </div>
                     </td>
@@ -227,7 +228,7 @@ const Booking = () => {
                       {selectedStatus === "active" && (
                         <Tooltip content="Assign Employee Booking">
                           <IconButton
-                            onClick={() => handleAsignEmpBooking(item?._id)}
+                            onClick={() => handleAsignEmpBooking(item)}
                             variant="text"
                           >
                             <UserPlusIcon className="h-6 w-6" />
@@ -237,7 +238,7 @@ const Booking = () => {
                       {selectedStatus === "ongoing" && (
                         <Tooltip content="Assign Employee Booking">
                           <IconButton
-                            onClick={() => handleAsignEmpBooking(item?._id,item?.user)}
+                            onClick={() => handleAsignEmpBooking(item)}
                             variant="text"
                           >
                             <UserPlusIcon className="h-6 w-6" />

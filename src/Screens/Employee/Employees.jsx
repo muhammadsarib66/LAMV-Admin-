@@ -14,7 +14,6 @@ import {
 } from "@material-tailwind/react";
 import { useSelector, useDispatch } from "react-redux";
 // import { getCustomersApi } from "../features/slicer/CustomerSlicer";
-import { deleteCustomerApi } from "../../features/slicer/DeleteCustomerSlicer";
 import Loader from "../../component/Loader";
 import ActionEmployeeModal from "./ActionEmployeeModal";
 import { setIsEmployeeActionModalOpen, setisModalOpen } from "../../features/slicer/Slicer";

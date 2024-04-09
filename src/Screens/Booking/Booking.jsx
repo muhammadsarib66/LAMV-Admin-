@@ -90,8 +90,8 @@ const Booking = () => {
     filteredBookings = [];
   }
   const handleAsignEmpBooking = (item) => {
-    const { bookingId, _id } = item;
-    console.log(bookingId, _id);
+    const {  _id } = item;
+    // console.log(bookingId, _id);
     setBookingId(_id);
     dispatch(setIsAssignEmpModalOpen());
   };
@@ -101,7 +101,7 @@ const Booking = () => {
   };
   const handleInfoOpen = (item) => {
     setBookingDetail(item);
-    console.log(item);
+    // console.log(item);
     dispatch(setIsModalOpen());
   };
   const handleDeleteBooking = (id) => {

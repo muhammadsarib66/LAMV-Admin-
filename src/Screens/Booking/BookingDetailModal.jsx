@@ -27,7 +27,7 @@ export default function BookingDetailModal({ bookingDetail }) {
   const dispatch = useDispatch();
   const GOOGLE_API_KEY = "AIzaSyD_Q_4oINoF9y41aNa-Rp2E8BzGuMSfE0I";
 
-  const baseURL = "http://65.20.104.196:3002/";
+ 
 
   const {
     photos,
@@ -125,16 +125,18 @@ export default function BookingDetailModal({ bookingDetail }) {
               </div>
             )}
             {photos && (
-              <div className="flex gap-2 bg-gray-200 rounded-md p-2 ">
+              <div className="flex gap-4  bg-gray-200 rounded-md p-2 ">
                 <p>Images:</p>
-                {photos?.map((item, index) => (
+                {photos?.map((item, index) =>{
+                  console.log(item)  
+                  return (
                   <img
                     key={index}
-                    src={baseURL + item}
+                    src={baseUrl+item}
                     alt="image"
                     className={` duration-300 w-44 h-44`}
                   />
-                ))}
+                )} )}
               </div>
             )}
             <div>

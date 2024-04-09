@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl, config } from "./Slicer";
 import { toast } from "react-toastify";
-import { getSubCatApi } from "./getSubCat";
+import { getSubCatApi } from "./GetSubCatSlicer";
 
 export const DeleteSubCatApi = createAsyncThunk(
   "adminPanel/DeleteSubCat",

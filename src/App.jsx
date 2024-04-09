@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getCustomersApi } from "./features/slicer/CustomerSlicer";
 import { getMainCatApi } from "./features/slicer/GetMainCatSlicer";
-import { getSubCatApi } from "./features/slicer/getSubCat";
+import { getSubCatApi } from "./features/slicer/GetSubCatSlicer";
 import { getEmployeeApi } from "./features/slicer/GetEmployeeSlicer";
 import { getBookingApi } from "./features/slicer/GetBookingSlicer";
 function App() {

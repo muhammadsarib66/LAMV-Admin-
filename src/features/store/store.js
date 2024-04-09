@@ -3,7 +3,7 @@ import Slicer from "../slicer/Slicer";
 import CustomerSlicer from "../slicer/CustomerSlicer";
 import DeleteCustomerSlicer from "../slicer/DeleteCustomerSlicer";
 import GetMainCatSlicer from "../slicer/GetMainCatSlicer";
-import GetSubCatSlicer from "../slicer/getSubCat" 
+import GetSubCatSlicer from "../slicer/GetSubCatSlicer" 
 import DeleteSubCatSlicer from "../slicer/DeleteSubCatSlicer" 
 import GetEmployeeSlicer from "../slicer/GetEmployeeSlicer";
 import DeleteEmployeeSlicer from "../slicer/DeleteEmployeeSlicer";

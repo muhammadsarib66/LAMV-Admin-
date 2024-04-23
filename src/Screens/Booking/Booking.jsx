@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable react/prop-types */
 import {  useState } from "react";
 import {
@@ -17,6 +18,8 @@ import {
   Tooltip,
   Input,
   Button,
+  Option,
+  Select
 } from "@material-tailwind/react";
 import {
   setIsModalOpen,
@@ -129,10 +132,6 @@ const Booking = () => {
     setId(id);
     setIsOpen(true);
   };
-  // useEffect(() => {
-  //   // Fetch customers data when the component mounts
-  //   dispatch(getBookingApi());
-  // }, [dispatch]);
 
   return (
     <>
@@ -156,12 +155,22 @@ const Booking = () => {
               value={selectedStatus}
               onChange={(e) => handleStatusChange(e.target.value)}
             >
-              {FilterTab.map((item, index) => (
-                <option key={index} value={item.value}>
-                  {item.title}
+              {FilterTab.map((item, index) => {
+                 let arrayLength = 0; // Initialize array length
+                 if (getBookings.hasOwnProperty(item.value)) {
+                   arrayLength = getBookings[item.value].length; // Get the length of the array based on the option value
+                 }
+                return(
+                <option className=" flex" key={index} value={item.value}>
+                <span>  {item.title} </span>
+                   <span className=" ">
+                   ({arrayLength})
+                    </span>
+
                 </option>
-              ))}
+              )})}
             </select>
+            
             <div className="w-full md:w-72">
               <Input
                 value={searchQuery}

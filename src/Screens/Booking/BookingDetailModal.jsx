@@ -8,6 +8,8 @@ import { Chip } from "@material-tailwind/react";
 import { setIsModalClose } from "../../features/slicer/GetBookingSlicer";
 import { MapPinIcon } from "@heroicons/react/24/solid";
 import GoogleMapReact from "google-map-react";
+// import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+// import { useMemo } from "react";
 
 const style = {
   position: "absolute",
@@ -16,7 +18,7 @@ const style = {
   transform: "translate(-50%, -50%)",
   height: "87%",
   bgcolor: "background.paper",
-  border: "2px solid #000",
+  // border: "2px solid #000",
   boxShadow: 24,
 
   p: 4,
@@ -27,7 +29,10 @@ export default function BookingDetailModal({ bookingDetail }) {
   const dispatch = useDispatch();
   const GOOGLE_API_KEY = "AIzaSyD_Q_4oINoF9y41aNa-Rp2E8BzGuMSfE0I";
 
- 
+  // const { isLoaded } = useLoadScript({
+  //   googleMapsApiKey: GOOGLE_API_KEY,
+  // });
+  // const center = useMemo(() => ({ lat: 18.52043, lng: 73.856743 }), []);
 
   const {
     photos,
@@ -50,6 +55,13 @@ export default function BookingDetailModal({ bookingDetail }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style} className="overflow-y-scroll w-[700px]  ">
+          <div className="flex justify-end ">
+            {" "}
+            <i
+              onClick={handleClose}
+              className="cursor-pointer text-2xl fa-solid fa-xmark"
+            ></i>
+          </div>
           <div className="flex flex-col gap-4">
             <Typography id="modal-modal-title" variant="h4" component="h2">
               Booking Detail
@@ -114,29 +126,34 @@ export default function BookingDetailModal({ bookingDetail }) {
             {attachedBudget && (
               <div>
                 <p className="font-bold">Budget Attch</p>
-                <div>
-                  <embed
-                    src={baseUrl + attachedBudget}
-                    type="application/pdf"
-                    width="100%"
-                    height="400px"
-                  />
+
+                <div style={{ width: "100%", height: "800px" }}>
+                  <iframe
+                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(
+                      baseUrl + attachedBudget
+                    )}&embedded=true`}
+                    title="PDF Viewer"
+                    style={{ width: "100%", height: "100%", border: "none" }}
+                    frameBorder="0"
+                  >
+                    <p>Your browser does not support iframes.</p>
+                  </iframe>
                 </div>
               </div>
             )}
             {photos && (
               <div className="flex gap-4  bg-gray-200 rounded-md p-2 ">
                 <p>Images:</p>
-                {photos?.map((item, index) =>{
-                  console.log(item)  
+                {photos?.map((item, index) => {
                   return (
-                  <img
-                    key={index}
-                    src={baseUrl+item}
-                    alt="image"
-                    className={` duration-300 w-44 h-44`}
-                  />
-                )} )}
+                    <img
+                      key={index}
+                      src={baseUrl + item}
+                      alt="image"
+                      className={` duration-300 w-44 h-44`}
+                    />
+                  );
+                })}
               </div>
             )}
             <div>
@@ -148,15 +165,29 @@ export default function BookingDetailModal({ bookingDetail }) {
             <div className="h-52 w-full">
               <GoogleMapReact
                 bootstrapURLKeys={{ key: GOOGLE_API_KEY }}
-                defaultCenter={{
+                center={{
                   lat: address?.latitude,
                   lng: address?.longitude,
                 }}
                 defaultZoom={16}
+                // draggable={false} // Disable map dragging
+                zoomControl={false} // Disable zoom controls
+                scrollwheel={false} // Disable scroll wheel zoom
               >
-                {/* Marker */}
                 <Marker lat={address?.latitude} lng={address?.longitude} />
               </GoogleMapReact>
+              {/* {!isLoaded ? (
+        <h1>Loading...</h1>
+      ) : (
+        <GoogleMap
+          mapContainerClassName="map-container"
+          center={center}
+          zoom={10}
+        >
+          <Marker position={{ lat: address?.latitude,
+          lng: address?.longitude, }} />
+        </GoogleMap>
+      )} */}
             </div>
           </div>
         </Box>

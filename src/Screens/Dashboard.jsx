@@ -50,7 +50,7 @@ const Dashboard = () => {
                 <span className="text-green-800"> {item.total} </span>
               </p>
             </div>
-            <div className="text-3xl bg-red-100 text-red-600 p-3 rounded-md">
+            <div className="text-3xl bg-purple-100 text-purple-600 p-3 rounded-md">
               <i className={`fa-solid  ${item.icon}`}></i>
             </div>
           </div>

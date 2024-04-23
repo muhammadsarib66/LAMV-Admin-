@@ -7,6 +7,7 @@ import { TextField } from "@mui/material";
 import { setisModalClose } from "../../features/slicer/Slicer";
 import { Button } from "@material-tailwind/react";
 import { AddEmployeeApi } from "../../features/slicer/AddEmployeeSlicer";
+import { toast } from "react-toastify";
 // import { setisModalOpen } from '../features/slicer/Slicer';
 const style = {
   position: "absolute",
@@ -38,8 +39,9 @@ export default function AddEmployeeModal() {
 
   const handleAddEmployee = () => {
     console.log(addEmployee);
-    dispatch(AddEmployeeApi(addEmployee));
-    
+    if(addEmployee.email === "" || addEmployee.fullname === "" || addEmployee.phoneNumber === "" || addEmployee.password === "") return toast.error('Please fill all the fields')
+  
+    dispatch(AddEmployeeApi(addEmployee));  
     setAddEmployee({
       email: "",
       fullname: "",

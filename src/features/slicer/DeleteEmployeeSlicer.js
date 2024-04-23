@@ -24,17 +24,23 @@ export const DeleteEmployeeApi = createAsyncThunk(
 const initialState = {
   isLoading: false,
   isError: false,
+  isOpen : false,
 };
 
 const DeleteEmployeeSlicer = createSlice({
   name: "deleteemployee",
   initialState,
-  reducers: {},
+  reducers: {
+    DeleteEmployyee : (state,action)=>{
+      state.isOpen = action.payload
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(DeleteEmployeeApi.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(DeleteEmployeeApi.fulfilled, (state) => {
+      state.isOpen= false
       state.isLoading = false;
     });
     builder.addCase(DeleteEmployeeApi.rejected, (state) => {
@@ -44,5 +50,5 @@ const DeleteEmployeeSlicer = createSlice({
   },
 });
 
-//   export const {showCustomer} = Delete.actions;
+  export const {DeleteEmployyee} = DeleteEmployeeSlicer.actions;
 export default DeleteEmployeeSlicer.reducer;

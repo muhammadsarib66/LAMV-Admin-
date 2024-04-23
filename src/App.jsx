@@ -16,6 +16,7 @@ import { getMainCatApi } from "./features/slicer/GetMainCatSlicer";
 import { getSubCatApi } from "./features/slicer/GetSubCatSlicer";
 import { getEmployeeApi } from "./features/slicer/GetEmployeeSlicer";
 import { getBookingApi } from "./features/slicer/GetBookingSlicer";
+import CustomNotification from "./Screens/CustomNotification";
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -26,12 +27,16 @@ function App() {
     dispatch(getBookingApi());
   }, []);
   return (
-    <section className="flex  ">
+    <section className="grid grid-cols-12 gap-2  ">
       <Router>
+        <div className="col-span-3">
+
         <Drawer />
-        <div>
+          </div>
+        <div className="col-span-9">
           <AppBar />
-          <div className="mt-5">
+          
+          <div className=" mt-5">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="customers" element={<Customers />} />
@@ -39,6 +44,10 @@ function App() {
               <Route path="booking" element={<Booking />} />
               <Route path="maincategory" element={<MainCategory />} />
               <Route path="subcategory" element={<SubCategory />} />
+              <Route
+                path="customnotification"
+                element={<CustomNotification />}
+              />
             </Routes>
           </div>
         </div>

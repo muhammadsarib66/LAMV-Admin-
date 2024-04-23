@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, TrashIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import {
@@ -13,23 +13,25 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { useSelector, useDispatch } from "react-redux";
-// import { getCustomersApi } from "../features/slicer/CustomerSlicer";
 import Loader from "../../component/Loader";
 import ActionEmployeeModal from "./ActionEmployeeModal";
-import { setIsEmployeeActionModalOpen, setisModalOpen } from "../../features/slicer/Slicer";
-import { getEmployeeApi } from "../../features/slicer/GetEmployeeSlicer";
-import { DeleteEmployeeApi } from "../../features/slicer/DeleteEmployeeSlicer";
+import {
+  setIsEmployeeActionModalOpen,
+  setisModalOpen,
+} from "../../features/slicer/Slicer";
+import { DeleteEmployyee } from "../../features/slicer/DeleteEmployeeSlicer";
 import AddEmployeeModal from "./AddEmployeeModal";
+import EmployeeDeleteModal from "../../component/EmployeeDeleteModal";
 
 const Employees = () => {
   const dispatch = useDispatch();
   const { getEmpolyees, isLoading } = useSelector(
     (state) => state.GetEmployeeSlicer
   );
-  // const [TableData, setTableData] = useState(getCustomers);
   const [userId, setUserId] = useState("");
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [delId, setDelId] = useState("");
   const TABLE_HEAD = [
     "Sr.No",
     "Full Name",
@@ -46,13 +48,14 @@ const Employees = () => {
   };
 
   const handleDeleteEmployee = (id) => {
-    dispatch(DeleteEmployeeApi(id));
+    dispatch(DeleteEmployyee(true));
+    setDelId(id);
   };
 
-  useEffect(() => {
-    // Fetch customers data when the component mounts
-    dispatch(getEmployeeApi());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   // Fetch customers data when the component mounts
+  //   dispatch(getEmployeeApi());
+  // }, [dispatch]);
   const filteredEmployees = getEmpolyees.filter((customer) => {
     const isMatchFilter =
       filter === "all" ||
@@ -69,8 +72,8 @@ const Employees = () => {
   return (
     <>
       {isLoading && <Loader />}
-      <AddEmployeeModal  />
-      <ActionEmployeeModal userId={userId}  />
+      <AddEmployeeModal />
+      <ActionEmployeeModal userId={userId} />
 
       <Card className="h-full w-full mb-10">
         <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -81,15 +84,13 @@ const Employees = () => {
               </Typography>
             </div>
             <Button
-                onClick={() => dispatch(setisModalOpen())}
-                className="flex items-center gap-3"
-                size="sm"
-              >
-                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add
-                Employee
-              </Button>
+              onClick={() => dispatch(setisModalOpen())}
+              className="flex items-center gap-3"
+              size="sm"
+            >
+              <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Employee
+            </Button>
           </div>
-          <div className="    "></div>
 
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <select
@@ -113,8 +114,8 @@ const Employees = () => {
             </div>
           </div>
         </CardHeader>
-        <CardBody className="  overflow-scroll   h-[70vh] px-0">
-          <table className="mt-4 w-full  overflow-x-scroll min-w-max table-auto text-left">
+        <CardBody className="  overflow-scroll    h-[70vh] px-0">
+          <table className="mt-4 w-full   min-w-max table-auto text-left">
             <thead>
               <tr>
                 {TABLE_HEAD.map((head) => (
@@ -202,10 +203,10 @@ const Employees = () => {
                       <td className={classes}>
                         <Tooltip content="action">
                           <IconButton
-                            onClick={() => handleAction(item?._id)}
+                            onClick={() => handleAction(item)}
                             variant="text"
                           >
-                            <PencilIcon className="text-blue-800 h-4 w-4" />
+                            <PencilIcon className=" h-5 w-5" color="blue" />
                           </IconButton>
                         </Tooltip>
                         <Tooltip content="Delete user ">
@@ -213,7 +214,7 @@ const Employees = () => {
                             onClick={() => handleDeleteEmployee(item?._id)}
                             variant="text"
                           >
-                            <TrashIcon className="text-red-700 h-4 w-4" />
+                            <TrashIcon className="h-5 w-5" color="red" />
                           </IconButton>
                         </Tooltip>
                       </td>
@@ -224,6 +225,7 @@ const Employees = () => {
           </table>
         </CardBody>
       </Card>
+      <EmployeeDeleteModal id={delId} />
     </>
   );
 };

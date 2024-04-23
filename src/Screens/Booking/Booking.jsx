@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
+import {  useState } from "react";
 import {
   DocumentPlusIcon,
   InformationCircleIcon,
@@ -14,9 +15,10 @@ import {
   Chip,
   IconButton,
   Tooltip,
+  Input,
+  Button,
 } from "@material-tailwind/react";
 import {
-  getBookingApi,
   setIsModalOpen,
 } from "../../features/slicer/GetBookingSlicer";
 import Loader from "../../component/Loader";
@@ -26,12 +28,16 @@ import AddBudgetModal from "./AddBudgetModal";
 import { setIsBudgetModalOpen } from "../../features/slicer/AddBudgetSlicer";
 import AssigEmpBookingModal from "./AssigEmpBookingModal";
 import { setIsAssignEmpModalOpen } from "../../features/slicer/AssignEmpBookingSlicer";
+import moment from "moment";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Box, Modal } from "@mui/material";
 const Booking = () => {
   const dispatch = useDispatch();
   const { getBookings, isLoading } = useSelector(
     (state) => state.GetBookingSlicer
   );
   const TABLE_HEAD = [
+    "Sr No",
     "Booking By",
     "Booked on",
     "Booked For",
@@ -68,6 +74,10 @@ const Booking = () => {
   const [bookingDetail, setBookingDetail] = useState("");
   const [bookingId, setBookingId] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("active");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [id, setId] = useState("");
 
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
@@ -89,6 +99,17 @@ const Booking = () => {
     // Handle other cases, such as 'cancelled', 'completed', etc.
     filteredBookings = [];
   }
+  
+  if (searchQuery) {
+    filteredBookings = filteredBookings.filter((booking) => {
+      return (
+        booking?.bookedBy?.fullname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking?.bookedFor?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking?.bookingId?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
+  }
+  
   const handleAsignEmpBooking = (item) => {
     const {  _id } = item;
     // console.log(bookingId, _id);
@@ -101,16 +122,17 @@ const Booking = () => {
   };
   const handleInfoOpen = (item) => {
     setBookingDetail(item);
-    // console.log(item);
+    console.log(item);
     dispatch(setIsModalOpen());
   };
   const handleDeleteBooking = (id) => {
-    dispatch(DeleteBookingApi(id));
+    setId(id);
+    setIsOpen(true);
   };
-  useEffect(() => {
-    // Fetch customers data when the component mounts
-    dispatch(getBookingApi());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   // Fetch customers data when the component mounts
+  //   dispatch(getBookingApi());
+  // }, [dispatch]);
 
   return (
     <>
@@ -140,10 +162,18 @@ const Booking = () => {
                 </option>
               ))}
             </select>
+            <div className="w-full md:w-72">
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                label="Search"
+                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
+              />
+            </div>
           </div>
         </CardHeader>
-        <CardBody className="  overflow-scroll    h-[70vh] px-0">
-          <table className="mt-4 w-full  overflow-x-scroll min-w-max table-auto text-left">
+        <CardBody className="    h-[70vh] overflow-y-scroll     px-0">
+          <table className="mt-4 w-full    min-w-max table-auto text-left">
             <thead>
               <tr>
                 {TABLE_HEAD.map((head, ind) => (
@@ -162,7 +192,7 @@ const Booking = () => {
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="    overflow-scroll">
               {filteredBookings?.map((item, index) => {
                 const isLast = index === filteredBookings.length - 1;
                 const classes = isLast
@@ -177,7 +207,18 @@ const Booking = () => {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {item?._id}
+                          {index + 1}
+                        </Typography>
+                      </div>
+                    </td>
+                    <td className={classes}>
+                      <div className="flex items-center gap-3">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {item?.bookedBy?.fullname? item?.bookedBy?.fullname : "Uknown Person"}
                         </Typography>
                       </div>
                     </td>
@@ -187,7 +228,8 @@ const Booking = () => {
                         color="blue-gray"
                         className="font-normal"
                       >
-                        {item?.bookedOn}
+                       { moment(item?.bookedOn).format("MMM Do YYYY")
+                        }
                       </Typography>
                     </td>
                     <td className={classes}>
@@ -268,7 +310,7 @@ const Booking = () => {
                           onClick={() => handleDeleteBooking(item?._id)}
                           variant="text"
                         >
-                          <TrashIcon className=" text-red-500 h-6 w-6" />
+                          <TrashIcon className=" text-red-500 h-5 w-5" />
                         </IconButton>
                       </Tooltip>
                     </td>
@@ -279,8 +321,57 @@ const Booking = () => {
           </table>
         </CardBody>
       </Card>
+      <BokingDetteModal id={id} isOpen={isOpen} setIsOpen={setIsOpen} />  
     </>
   );
 };
 
 export default Booking;
+
+
+
+export const BokingDetteModal = ({ id, isOpen, setIsOpen }) => {
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+  };
+
+  const dispatch = useDispatch();
+  const handleClose = () => setIsOpen(false);
+
+  const handleDelete = () => {
+    dispatch(DeleteBookingApi(id));
+
+    // dispatch(DeleteMainCatApi(id));
+  };
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style} className="flex flex-col gap-5">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-xl font-semibold ">
+            Do You want to delete the Booking .?
+          </h1>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button variant="outlined" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleDelete}>
+            Delete
+          </Button>
+        </div>
+      </Box>
+    </Modal>
+  );
+};

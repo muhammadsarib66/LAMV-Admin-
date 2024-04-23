@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Button,
   Card,
@@ -5,6 +6,7 @@ import {
   CardHeader,
   Chip,
   IconButton,
+  Input,
   Tooltip,
   Typography,
 } from "@material-tailwind/react";
@@ -14,18 +16,31 @@ import { setisMainCatModal } from "../features/slicer/Slicer";
 import AddMainCategoryModal from "../component/AddMainCategoryModal";
 import Loader from "../component/Loader";
 import { DeleteMainCatApi } from "../features/slicer/DeleteMainCat";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
+import { Box, Modal } from "@mui/material";
 
 const MainCategory = () => {
   const { getMainCat, isLoading } = useSelector(
     (state) => state.GetMainCatSlicer
   );
-  const TABLE_HEAD = ["ID", "Category Name", "Status", "Action"];
+  const TABLE_HEAD = ["Sr No#", "Category Name", "Status", "Action"];
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [id, setId] = useState("");
 
   const dispatch = useDispatch();
 
+  let filterMainCat =
+    getMainCat &&
+    getMainCat?.filter((item) => {
+      return item.title.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
   const HandleDelete = (item) => {
+    setId(item);
+    setIsOpen(true);
     // console.log(item);
-    dispatch(DeleteMainCatApi(item));
   };
 
   return (
@@ -50,6 +65,16 @@ const MainCategory = () => {
               </Button>
             </div>
           </div>
+          <div className="flex justify-end">
+            <div className="w-full  md:w-72">
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                label="Search"
+                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardBody className="  overflow-scroll   h-[70vh] px-0">
           <table className="mt-4 w-full  overflow-x-scroll min-w-max table-auto text-left">
@@ -72,7 +97,7 @@ const MainCategory = () => {
               </tr>
             </thead>
             <tbody>
-              {getMainCat?.map((item, index) => {
+              {filterMainCat?.map((item, index) => {
                 const isLast = index === getMainCat.length - 1;
                 const classes = isLast
                   ? "p-4"
@@ -117,7 +142,7 @@ const MainCategory = () => {
                     >
                       <Tooltip content="Delete">
                         <IconButton variant="text">
-                          <TrashIcon className="w-5 h-5" />
+                          <TrashIcon className="w-5 h-5" color="red" />
                         </IconButton>
                       </Tooltip>
                     </td>
@@ -129,8 +154,53 @@ const MainCategory = () => {
         </CardBody>
       </Card>
       <AddMainCategoryModal />
+      <MainCatDeleteModal id={id} isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   );
 };
 
 export default MainCategory;
+
+export const MainCatDeleteModal = ({ id, isOpen, setIsOpen }) => {
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+  };
+
+  const dispatch = useDispatch();
+  const handleClose = () => setIsOpen(false);
+
+  const handleDelete = () => {
+    dispatch(DeleteMainCatApi(id));
+  };
+  return (
+    <Modal
+      open={isOpen}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style} className="flex flex-col gap-5">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-xl font-semibold ">
+            Do You want to delete the MainCategory .?
+          </h1>
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button variant="outlined" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleDelete}>
+            Delete
+          </Button>
+        </div>
+      </Box>
+    </Modal>
+  );
+};

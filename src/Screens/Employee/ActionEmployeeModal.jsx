@@ -11,20 +11,21 @@ import {
   setIsEmployeeActionModalClose,
 } from "../../features/slicer/Slicer";
 import { getEmployeeApi } from "../../features/slicer/GetEmployeeSlicer";
+import { Divider } from "@mui/material";
 const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
+  bgcolor: 'background.paper',
   boxShadow: 24,
-  p: 4,
+  // p: 4,
 };
 
 export default function ActionEmployeeModal({ userId }) {
   const dispatch = useDispatch();
+  console.log(userId)
   const { isEmployeeActionModalOpen } = useSelector((state) => state.Slicer);
   const handleClose = () => dispatch(setIsEmployeeActionModalClose());
 
@@ -32,7 +33,7 @@ export default function ActionEmployeeModal({ userId }) {
     await axios
       .post(
         `${baseUrl}employees/unblock-employee`,
-        { employeeId: userId },
+        { employeeId: userId?._id },
         config
       )
       .then(() => {
@@ -48,7 +49,7 @@ export default function ActionEmployeeModal({ userId }) {
     await axios
       .post(
         `${baseUrl}employees/block-employee`,
-        { employeeId: userId },
+        { employeeId: userId?._id },
         config
       )
       .then(() => {
@@ -69,15 +70,23 @@ export default function ActionEmployeeModal({ userId }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
-          <div className="flex justify-around">
-            <Button onClick={handleActive} color="green">
-              Active
-            </Button>
-            <Button onClick={handleBlock} color="red">
-              block
-            </Button>
-          </div>
+       <Box sx={style} className=' flex flex-col gap-4 p-4'>
+            <div className="flex justify-between  ">
+            <h1 className='text-xl font-semibold '>
+              Employee is currently {userId && userId.isActive ? 'Active' : 'Blocked'} 
+            </h1>
+            <i onClick={handleClose} className="fa-solid text-xl fa-xmark cursor-pointer"></i>
+              </div>
+              <p> please click on button to perform an action</p>
+           
+
+          <Divider />
+         <div className='flex justify-end gap-2'>
+         <Button disabled={userId?.isActive} onClick={handleActive}  variant='outlined'>Active</Button>
+         <Button  disabled={userId?.isBlocked} onClick={handleBlock} variant='standard'>block</Button>
+         </div>
+         
+
         </Box>
       </Modal>
     </div>

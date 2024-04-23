@@ -13,24 +13,34 @@ import {
   InboxIcon,
   TagIcon,
   PowerIcon,
-  PhoneArrowDownLeftIcon
+  PhoneArrowDownLeftIcon,
+  BellAlertIcon
 } from "@heroicons/react/24/solid";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const Drawer = () => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const openDrawer = () => setIsDrawerOpen(true);
+  const closeDrawer = () => setIsDrawerOpen(false);
+ 
   return (
     // h-[calc(100vh-2rem)]
-    <Card
-      className="  h-auto min-h-screen   bg-gray-50
-       w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5"
+    <Card 
+      className="  min-h-full   bg-gray-50
+       w-full  p-4 shadow-xl shadow-blue-gray-900/5"
     >
-      <div className="mb-2 p-4">
+      <div className="mb-2 p-4 flex justify-between items-center">
         <Typography variant="h5" color="blue-gray">
           Admin Portal
         </Typography>
+        {isDrawerOpen && (
+          <i  className="  fa-solid fa-bars"></i> 
+        ) }
+
       </div>
-      <List>
-        <Link className="flex" to="/">
+      <List >
+        <Link className="flex " to="/">
           <ListItem>
             <ListItemPrefix>
               <PresentationChartBarIcon className="h-5 w-5" />
@@ -84,6 +94,16 @@ const Drawer = () => {
           </ListItemPrefix>
           Customer Support
         </ListItem>
+        <Link className="flex" to="/customnotification">
+
+        <ListItem>
+          <ListItemPrefix>
+            <BellAlertIcon className="h-5 w-5" />
+          </ListItemPrefix>
+          Custom Notification
+        </ListItem>
+        </Link>
+
         <ListItem>
           <ListItemPrefix>
             <PowerIcon className="h-5 w-5" />

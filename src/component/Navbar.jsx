@@ -49,7 +49,7 @@ const AppBar = () => {
   }, []);
 
   return (
-    <Navbar className=" max-w-screen-xl w-screen px-6 py-3">
+    <Navbar className="  w-full px-6 py-3">
       <div className="flex items-center justify-between text-blue-gray-900">
         <Typography
           as="a"
@@ -69,7 +69,7 @@ const AppBar = () => {
           onClick={() => setOpenNav(!openNav)}
         >
           {openNav ? (
-            <XMarkIcon className="h-6 w-6" strokeWidth={2} />
+            <XMarkIcon className="h-6 w-6" strokeWidth={2} /> 
           ) : (
             <Bars3Icon className="h-6 w-6" strokeWidth={2} />
           )}

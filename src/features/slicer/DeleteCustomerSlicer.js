@@ -23,12 +23,22 @@ export const deleteCustomerApi = createAsyncThunk(
 const initialState = {
   isLoading: false,
   isError: false,
+  isOpen : false
 };
 
 const DeleteCustomerSlicer = createSlice({
   name: "deletecustomer",
   initialState,
-  reducers: {},
+  reducers: {
+    setIsCustomerDelModal : (state) =>{
+      state.isOpen = true
+      console.log(state.isOpen)
+    },
+    setIsCustomerDelModalClose : (state,) =>{
+      state.isOpen = false
+      console.log(state.isOpen)
+    }
+  },
   extraReducers: (builder) => {
     /// for delete user
     builder.addCase(deleteCustomerApi.pending, (state) => {
@@ -43,5 +53,5 @@ const DeleteCustomerSlicer = createSlice({
     });
   },
 });
-
+export const  {setIsCustomerDelModal, setIsCustomerDelModalClose} =  DeleteCustomerSlicer.actions
 export default DeleteCustomerSlicer.reducer;

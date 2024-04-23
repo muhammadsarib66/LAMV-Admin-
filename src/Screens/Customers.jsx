@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
@@ -12,11 +12,11 @@ import {
   Tooltip,
 } from "@material-tailwind/react";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteCustomerApi } from "../features/slicer/DeleteCustomerSlicer";
+import {  setIsCustomerDelModal } from "../features/slicer/DeleteCustomerSlicer";
 import Loader from "../component/Loader";
 import EditCustomerModal from "../component/EditCustomerModal";
 import { setIsCustomerActionModalOpen } from "../features/slicer/Slicer";
-import { getCustomersApi } from "../features/slicer/CustomerSlicer";
+import CustomerDeleteModal from "../component/CustomerDeleteModal";
 
 const Customers = () => {
   const dispatch = useDispatch();
@@ -27,6 +27,9 @@ const Customers = () => {
   const [userId, setUserId] = useState("");
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const [ delId, setDelId] = useState('')
+  
   const TABLE_HEAD = [
     "Sr.No",
     "Full Name",
@@ -37,32 +40,33 @@ const Customers = () => {
     "Action",
   ];
 
-  const handleAction = (id) => {
-    setUserId(id);
+  const handleAction = (item) => {
+    setUserId(item);
     dispatch(setIsCustomerActionModalOpen());
   };
 
   const handleDeleteCustomer = (id) => {
-    dispatch(deleteCustomerApi(id));
+    dispatch(setIsCustomerDelModal(true));
+    setDelId(id)  
   };
+ 
 
-  useEffect(() => {
-    // Fetch customers data when the component mounts
-    dispatch(getCustomersApi());
-  }, [dispatch]);
-  const filteredCustomers = getCustomers.filter((customer) => {
+  // useEffect(() => {
+  //   // Fetch customers data when the component mounts
+  //   dispatch(getCustomersApi());
+  // }, [dispatch]);
+  const filteredCustomers = getCustomers && Array.isArray(getCustomers) ? getCustomers.filter((customer) => {
     const isMatchFilter =
       filter === "all" ||
-      (filter === "active" && customer.isActive === true) ||
-      (filter === "blocked" && customer.isActive === false);
+      (filter === "active" && customer?.isActive === true) ||
+      (filter === "blocked" && customer?.isActive === false);
 
     const isMatchSearch =
-      customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.fullname.toLowerCase().includes(searchQuery.toLowerCase());
+      customer?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customer?.fullname.toLowerCase().includes(searchQuery.toLowerCase());
 
     return isMatchFilter && isMatchSearch;
-  });
-
+  }) : [];
   return (
     <>
       {isLoading && <Loader />}
@@ -101,7 +105,7 @@ const Customers = () => {
             </div>
           </div>
         </CardHeader>
-        <CardBody className="  overflow-scroll   h-[70vh] px-0">
+        <CardBody className="     h-[70vh] px-0">
           <table className="mt-4 w-full  overflow-x-scroll min-w-max table-auto text-left">
             <thead>
               <tr>
@@ -122,7 +126,7 @@ const Customers = () => {
               </tr>
             </thead>
             <tbody>
-              {getCustomers &&
+              {getCustomers.length>0 ?
                 filteredCustomers?.map((item, index) => {
                   const isLast = index === getCustomers?.length - 1;
                   const classes = isLast
@@ -190,10 +194,11 @@ const Customers = () => {
                       <td className={classes}>
                         <Tooltip content="action">
                           <IconButton
-                            onClick={() => handleAction(item?._id)}
+                            onClick={() => handleAction(item)}
                             variant="text"
                           >
-                            <PencilIcon className="text-blue-800 h-4 w-4" />
+                            <PencilIcon className=" h-5 w-5" color="blue" />
+                            
                           </IconButton>
                         </Tooltip>
                         <Tooltip content="Delete user ">
@@ -202,18 +207,25 @@ const Customers = () => {
                             variant="text"
                           >
                             <TrashIcon className="text-red-700 h-4 w-4" />
+                            
+                            {/* <DeleteModal isOpen={isOpen} setIsOpen={setIsOpen} id={delId}  /> */}
                           </IconButton>
+                          
                         </Tooltip>
                       </td>
                     </tr>
                   );
-                })}
+                }):
+                  <p> loading Data...</p>
+                }
             </tbody>
           </table>
         </CardBody>
       </Card>
+      <CustomerDeleteModal  id={delId}  />
     </>
   );
 };
+
 
 export default Customers;

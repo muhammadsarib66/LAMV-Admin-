@@ -3,81 +3,67 @@ import {
   Button,
   Card,
   CardBody,
-  CardHeader,
   Chip,
   IconButton,
-  Input,
   Tooltip,
   Typography,
 } from "@material-tailwind/react";
-import { UserPlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import {  TrashIcon } from "@heroicons/react/24/solid";
 import { useDispatch, useSelector } from "react-redux";
 import { setisMainCatModal } from "../features/slicer/Slicer";
 import AddMainCategoryModal from "../component/AddMainCategoryModal";
 import Loader from "../component/Loader";
 import { DeleteMainCatApi } from "../features/slicer/DeleteMainCat";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Modal } from "@mui/material";
+import Header from "../component/CardHeader";
 
 const MainCategory = () => {
   const { getMainCat, isLoading } = useSelector(
     (state) => state.GetMainCatSlicer
   );
   const TABLE_HEAD = ["Sr No#", "Category Name", "Status", "Action"];
-  const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [filterData, setFilterData] = useState([]);
+
+  const [search, setSearch] = useState("");
+
   const [id, setId] = useState("");
 
   const dispatch = useDispatch();
 
-  let filterMainCat =
-    getMainCat &&
-    getMainCat?.filter((item) => {
-      return item.title.toLowerCase().includes(searchQuery.toLowerCase());
-    });
-
   const HandleDelete = (item) => {
+    console.log(item)
     setId(item);
     setIsOpen(true);
-    // console.log(item);
   };
+
+  useEffect(() => {
+    if (search.length > 0) {
+      const filteredData = getMainCat?.filter((data) => {
+        return data.title.toLowerCase().includes(search.toLowerCase());
+      });
+      setFilterData(filteredData);
+    } else {
+      setFilterData(getMainCat);
+    }
+  }, [search, getMainCat]);
 
   return (
     <>
       {isLoading && <Loader />}
-      <Card>
-        <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="mb-8 flex items-center justify-between gap-8">
-            <div>
-              <Typography variant="h5" color="blue-gray">
-                Main Cateogry
-              </Typography>
-            </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                onClick={() => dispatch(setisMainCatModal())}
-                className="flex items-center gap-3"
-                size="sm"
-              >
-                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add
-                Category
-              </Button>
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <div className="w-full  md:w-72">
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                label="Search"
-                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardBody className="  overflow-scroll   h-[70vh] px-0">
-          <table className="mt-4 w-full  overflow-x-scroll min-w-max table-auto text-left">
+      <Card className="h-full  pt-10 md:pt-0  w-full mb-10">
+        <Header
+          handleAddBtn={() => dispatch(setisMainCatModal())}
+          BtnTitle={"Add Main Category"}
+          heading={"Main Category "}
+          headingDetail="See information about  Main Category"
+          setSearch={setSearch}
+        />
+
+        <CardBody className="     h-[70vh]  overflow-auto px-0">
+          <table className="mt-4 w-full   min-w-max table-auto text-left">
             <thead>
               <tr>
                 {TABLE_HEAD.map((head) => (
@@ -97,8 +83,8 @@ const MainCategory = () => {
               </tr>
             </thead>
             <tbody>
-              {filterMainCat?.map((item, index) => {
-                const isLast = index === getMainCat.length - 1;
+              {filterData?.map((item, index) => {
+                const isLast = index === filterData.length - 1;
                 const classes = isLast
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
@@ -178,6 +164,8 @@ export const MainCatDeleteModal = ({ id, isOpen, setIsOpen }) => {
 
   const handleDelete = () => {
     dispatch(DeleteMainCatApi(id));
+    handleClose()
+
   };
   return (
     <Modal

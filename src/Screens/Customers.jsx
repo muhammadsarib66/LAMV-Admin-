@@ -1,10 +1,7 @@
-import {  useState } from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {  useEffect, useState } from "react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   Card,
-  CardHeader,
-  Input,
   Typography,
   CardBody,
   Chip,
@@ -17,16 +14,17 @@ import Loader from "../component/Loader";
 import EditCustomerModal from "../component/EditCustomerModal";
 import { setIsCustomerActionModalOpen } from "../features/slicer/Slicer";
 import CustomerDeleteModal from "../component/CustomerDeleteModal";
+import Header from "../component/CardHeader";
 
 const Customers = () => {
   const dispatch = useDispatch();
   const { getCustomers, isLoading } = useSelector(
     (state) => state.CustomerSlicer
   );
-  // const [TableData, setTableData] = useState(getCustomers);
   const [userId, setUserId] = useState("");
-  const [filter, setFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filterData, setFilterData] = useState([]);
+  const [statusTab, setStatusTab] = useState("all");
+  const [search, setSearch] = useState("");
   
   const [ delId, setDelId] = useState('')
   
@@ -38,6 +36,20 @@ const Customers = () => {
     "Email",
     "Status",
     "Action",
+  ];
+  const CustomerStatusTABS = [
+    {
+      label: "All",
+      value: "all",
+    },
+    {
+      label: "Active",
+      value: "true",
+    },
+    {
+      label: "Blocked",
+      value: "false",
+    },
   ];
 
   const handleAction = (item) => {
@@ -51,62 +63,40 @@ const Customers = () => {
   };
  
 
-  // useEffect(() => {
-  //   // Fetch customers data when the component mounts
-  //   dispatch(getCustomersApi());
-  // }, [dispatch]);
-  const filteredCustomers = getCustomers && Array.isArray(getCustomers) ? getCustomers.filter((customer) => {
-    const isMatchFilter =
-      filter === "all" ||
-      (filter === "active" && customer?.isActive === true) ||
-      (filter === "blocked" && customer?.isActive === false);
-
-    const isMatchSearch =
-      customer?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer?.fullname.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return isMatchFilter && isMatchSearch;
-  }) : [];
+  useEffect(() => {
+    if (search.length > 0) {
+      const filteredData = getCustomers?.filter((data) => {
+        return data.username.toLowerCase().includes(search.toLowerCase());
+      });
+      setFilterData(filteredData);
+    } else {
+      // If search is cleared, reset filterData based on statusTab
+      const filteredData = getCustomers?.filter((data) => {
+        if (statusTab === "all") {
+          return true;
+        } else {
+          return data.isActive.toString() == statusTab;
+        }
+      });
+      setFilterData(filteredData);
+    }
+  }, [search, getCustomers, statusTab]);
+  // console.log('filterData', filterData)
   return (
     <>
       {isLoading && <Loader />}
       <EditCustomerModal userId={userId} />
 
-      <Card className="h-full w-full mb-10">
-        <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="mb-8 flex items-center justify-between gap-8">
-            <div>
-              <Typography variant="h5" color="blue-gray">
-                Customers
-              </Typography>
-            </div>
-          </div>
-          <div className="    "></div>
-
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <select
-              className="w-40 h-8  border-2 rounded-md  "
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            >
-              <option className=" " value="all">
-                All
-              </option>
-              <option value="active">Active</option>
-              <option value="blocked">Blocked</option>
-            </select>
-            <div className="w-full md:w-72">
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                label="Search"
-                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardBody className="     h-[70vh] px-0">
-          <table className="mt-4 w-full  overflow-x-scroll min-w-max table-auto text-left">
+      <Card className="h-full  pt-10 md:pt-0  w-full mb-10">
+      <Header
+        heading={"Customer List"}
+        headingDetail="See information about  Customers"
+        statusTabs={CustomerStatusTABS}
+        setStatusTab={setStatusTab}
+        setSearch={setSearch}
+      />
+        <CardBody className="     h-[70vh]  overflow-auto px-0">
+          <table className="mt-4 w-full min-w-max table-auto  text-left">
             <thead>
               <tr>
                 {TABLE_HEAD.map((head) => (
@@ -127,8 +117,8 @@ const Customers = () => {
             </thead>
             <tbody>
               {getCustomers.length>0 ?
-                filteredCustomers?.map((item, index) => {
-                  const isLast = index === getCustomers?.length - 1;
+                filterData?.map((item, index) => {
+                  const isLast = index === filterData?.length - 1;
                   const classes = isLast
                     ? "p-4"
                     : "p-4 border-b border-blue-gray-50";

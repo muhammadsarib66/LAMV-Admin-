@@ -1,6 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable react/prop-types */
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import {
   DocumentPlusIcon,
   InformationCircleIcon,
@@ -10,16 +10,12 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import {
   Card,
-  CardHeader,
   Typography,
   CardBody,
   Chip,
   IconButton,
   Tooltip,
-  Input,
   Button,
-  Option,
-  Select
 } from "@material-tailwind/react";
 import {
   setIsModalOpen,
@@ -34,6 +30,7 @@ import { setIsAssignEmpModalOpen } from "../../features/slicer/AssignEmpBookingS
 import moment from "moment";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Box, Modal } from "@mui/material";
+import Header from "../../component/CardHeader";
 const Booking = () => {
   const dispatch = useDispatch();
   const { getBookings, isLoading } = useSelector(
@@ -48,70 +45,44 @@ const Booking = () => {
     "Status",
     "Action",
   ];
-  const FilterTab = [
-    {
-      value: "active",
-      title: "Active",
-    },
-    {
-      value: "pending",
-      title: "Pending",
-    },
-    {
-      value: "cancelled",
-      title: "Cancelled",
-    },
-    {
-      value: "completed",
-      title: "Completed",
-    },
-    {
-      value: "ongoing",
-      title: "Ongoing",
-    },
-    {
-      value: "budgetAttached",
-      title: "budget Attached",
-    },
-  ];
+ 
   const [bookingDetail, setBookingDetail] = useState("");
   const [bookingId, setBookingId] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("active");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filterData, setFilterData] = useState(getBookings?.Active);
+  console.log(filterData)
+  const [statusTab, setStatusTab] = useState("active");
+  const [search, setSearch] = useState("");
+  // const [statusTab, setstatusTab] = useState("active");
 
   const [isOpen, setIsOpen] = useState(false);
   const [id, setId] = useState("");
-
-  const handleStatusChange = (status) => {
-    setSelectedStatus(status);
-  };
-  let filteredBookings;
-  if (selectedStatus === "active") {
-    filteredBookings = getBookings.active;
-  } else if (selectedStatus === "pending") {
-    filteredBookings = getBookings.pending;
-  } else if (selectedStatus === "cancelled") {
-    filteredBookings = getBookings.cancelled;
-  } else if (selectedStatus === "completed") {
-    filteredBookings = getBookings.completed;
-  } else if (selectedStatus === "ongoing") {
-    filteredBookings = getBookings.ongoing;
-  } else if (selectedStatus === "budgetAttached") {
-    filteredBookings = getBookings.budgetAttached;
-  } else {
-    // Handle other cases, such as 'cancelled', 'completed', etc.
-    filteredBookings = [];
-  }
-  
-  if (searchQuery) {
-    filteredBookings = filteredBookings.filter((booking) => {
-      return (
-        booking?.bookedBy?.fullname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking?.bookedFor?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking?.bookingId?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    });
-  }
+  const FilterTab = [
+    {
+      value: "active",
+      label: "Active",
+    },
+    {
+      value: "pending",
+      label: "Pending",
+    },
+    {
+      value: "cancelled",
+      label: "Cancelled",
+    },
+    {
+      value: "completed",
+      label: "Completed",
+    },
+    {
+      value: "ongoing",
+      label: "Ongoing",
+    },
+    {
+      value: "budgetAttached",
+      label: "budgetAttached",
+    },
+  ];
+ 
   
   const handleAsignEmpBooking = (item) => {
     const {  _id } = item;
@@ -133,56 +104,85 @@ const Booking = () => {
     setIsOpen(true);
   };
 
+
+  useEffect(() => {
+    if (search.length > 0) {
+      // Filter based on search input
+      const filteredData = Object.values(getBookings).flatMap((array) =>
+        array.filter((data) =>
+          data.bookingId.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+      setFilterData(filteredData);
+    } else {
+      // Filter based on statusTab matching keys in getBookings
+      const filteredData = Object.entries(getBookings).flatMap(([key, array]) =>
+        key === statusTab ? array : []
+      );
+      setFilterData(filteredData);
+    }
+  }, [search, getBookings, statusTab]);
+  // useEffect(() => {
+  //   if (search.length > 0) {
+  //     // Filter based on search input
+  //     const filteredData = Object.values(getBookings).flatMap((array) =>
+  //       array.filter((data) =>
+  //         data.bookingId.toLowerCase().includes(search.toLowerCase())
+  //       )
+  //     );
+  //     setFilterData(filteredData);
+  //   } else {
+  //     // Filter based on statusTab
+  //     const filteredData = Object.values(getBookings).flatMap((array) =>
+  //       array.filter((data) => {
+          
+  //         if (statusTab === "active") {
+  //           return true; // Return all data if statusTab is "active"
+  //         } else {
+
+  //           console.log(Object.keys(data), statusTab);
+  //           return data.status === statusTab; // Adjust this condition based on your actual data structure
+  //         }
+  //       })
+  //     );
+  //     setFilterData(filteredData);
+  //   }
+  // }, [search, getBookings, statusTab]);
+  
+  // useEffect(() => {
+  //   if (search.length > 0) {
+  //     const filteredData = getBookings?.filter((data) => {
+  //       return data.bookingId.toLowerCase().includes(search.toLowerCase());
+  //     });
+  //     setFilterData(filteredData);
+  //   } else {
+  //     // If search is cleared, reset filterData based on statusTab
+  //     const filteredData = getBookings?.filter((data) => {
+  //       if (statusTab === "active") {
+  //         return true;
+  //       } else {
+  //         return data.toString() == statusTab;
+  //       }
+  //     });
+  //     setFilterData(filteredData);
+  //   }
+  // }, [search, getBookings, statusTab]);
   return (
     <>
       {isLoading && <Loader />}
       <BookingDetailModal bookingDetail={bookingDetail} />
       <AddBudgetModal BookingID={bookingId} />
       <AssigEmpBookingModal AssignID={bookingId} />
-      <Card className="h-full  mb-10">
-        <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="mb-8 flex items-center justify-between gap-8">
-            <div>
-              <Typography variant="h5" color="blue-gray">
-                Booking List
-              </Typography>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start justify-between gap-4 md:flex-row">
-            <select
-              className="w-40 h-8  border-2 rounded-md  "
-              value={selectedStatus}
-              onChange={(e) => handleStatusChange(e.target.value)}
-            >
-              {FilterTab.map((item, index) => {
-                 let arrayLength = 0; // Initialize array length
-                 if (getBookings.hasOwnProperty(item.value)) {
-                   arrayLength = getBookings[item.value].length; // Get the length of the array based on the option value
-                 }
-                return(
-                <option className=" flex" key={index} value={item.value}>
-                <span>  {item.title} </span>
-                   <span className=" ">
-                   ({arrayLength})
-                    </span>
-
-                </option>
-              )})}
-            </select>
-            
-            <div className="w-full md:w-72">
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                label="Search"
-                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardBody className="    h-[70vh] overflow-y-scroll     px-0">
-          <table className="mt-4 w-full    min-w-max table-auto text-left">
+      <Card className="h-full  pt-10 md:pt-0  w-full mb-10">
+      <Header
+        heading={"Booking List"}
+        headingDetail="See information about  Bookings"
+        statusTabs={FilterTab}
+        setStatusTab={setStatusTab}
+        setSearch={setSearch}
+      />
+        <CardBody className="     h-[70vh]  overflow-auto px-0">
+          <table className="mt-4 w-full min-w-max table-auto  text-left">
             <thead>
               <tr>
                 {TABLE_HEAD.map((head, ind) => (
@@ -202,8 +202,8 @@ const Booking = () => {
               </tr>
             </thead>
             <tbody className="    overflow-scroll">
-              {filteredBookings?.map((item, index) => {
-                const isLast = index === filteredBookings.length - 1;
+              {filterData?.map((item, index) => {
+                const isLast = index === filterData.length - 1;
                 const classes = isLast
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
@@ -276,7 +276,7 @@ const Booking = () => {
                     </td>
 
                     <td className={classes}>
-                      {selectedStatus === "active" && (
+                      {statusTab === "active" && (
                         <Tooltip content="Assign Employee Booking">
                           <IconButton
                             onClick={() => handleAsignEmpBooking(item)}
@@ -286,7 +286,7 @@ const Booking = () => {
                           </IconButton>
                         </Tooltip>
                       )}
-                      {selectedStatus === "ongoing" && (
+                      {statusTab === "ongoing" && (
                         <Tooltip content="Assign Employee Booking">
                           <IconButton
                             onClick={() => handleAsignEmpBooking(item)}
@@ -296,7 +296,7 @@ const Booking = () => {
                           </IconButton>
                         </Tooltip>
                       )}
-                      {selectedStatus === "pending" && (
+                      {statusTab === "pending" && (
                         <Tooltip content="Add Budget">
                           <IconButton
                             onClick={() => handleAddBudget(item?._id)}
@@ -356,7 +356,7 @@ export const BokingDetteModal = ({ id, isOpen, setIsOpen }) => {
 
   const handleDelete = () => {
     dispatch(DeleteBookingApi(id));
-
+    handleClose()
     // dispatch(DeleteMainCatApi(id));
   };
   return (

@@ -4,27 +4,27 @@ import {
   Button,
   Card,
   CardBody,
-  CardHeader,
   Chip,
   IconButton,
-  Input,
   Tooltip,
   Typography,
 } from "@material-tailwind/react";
 import {
-  UserPlusIcon,
   TrashIcon,
-  MagnifyingGlassIcon,
 } from "@heroicons/react/24/solid";
 import AddSubCategoryModal from "../component/AddSubCategoryModal";
 import { useDispatch, useSelector } from "react-redux";
 import { setisSubCatModal } from "../features/slicer/Slicer";
 import Loader from "../component/Loader";
 import { DeleteSubCatApi } from "../features/slicer/DeleteSubCatSlicer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Modal } from "@mui/material";
+import Header from "../component/CardHeader";
 
 const SubCategory = () => {
+  const { getSubCat, isLoading } = useSelector(
+    (state) => state.GetSubCatSlicer
+  );
   const TABLE_HEAD = [
     "ID",
     "MainCategory ",
@@ -32,60 +32,44 @@ const SubCategory = () => {
     "Status",
     "Action",
   ];
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filterData, setFilterData] = useState([]);
+  const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [id, setId] = useState("");
+  const [subCatid, setSubCatid] = useState("");
 
-  const { getSubCat, isLoading } = useSelector(
-    (state) => state.GetSubCatSlicer
-  );
   const dispatch = useDispatch();
 
-  let filterSubCat =
-    getSubCat &&
-    getSubCat?.filter((item) => {
-      return item.title.toLowerCase().includes(searchQuery.toLowerCase());
-    });
+  useEffect(() => {
+    if (search.length > 0) {
+      const filteredData = getSubCat?.filter((data) => {
+        return data.title.toLowerCase().includes(search.toLowerCase());
+      });
+      setFilterData(filteredData);
+    } else {
+      setFilterData(getSubCat);
+    }
+  }, [search, getSubCat]);
+
 
   const HandleDelete = (item) => {
-    setId(item);
+
+    setSubCatid(item?._id);
     setIsOpen(true);
-    // dispatch(DeleteSubCatApi(item));
   };
+
   return (
     <>
       {isLoading && <Loader />}
-      <Card>
-        <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="mb-8 flex items-center justify-between gap-8">
-            <div>
-              <Typography variant="h5" color="blue-gray">
-                Sub Cateogry
-              </Typography>
-            </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                onClick={() => dispatch(setisSubCatModal())}
-                className="flex items-center gap-3"
-                size="sm"
-              >
-                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add
-                SubCategory
-              </Button>
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <div className="w-full  md:w-72">
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                label="Search"
-                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardBody className="    overflow-scroll  h-[70vh] px-0">
+      <Card className="h-full  pt-10 md:pt-0  w-full mb-10">
+        <Header
+          handleAddBtn={() => dispatch(setisSubCatModal())}
+          BtnTitle={"Add Sub Category"}
+          heading={"Sub Category "}
+          headingDetail="See information about  Sub Category"
+          setSearch={setSearch}
+        />
+
+        <CardBody className="     h-[70vh]  overflow-auto px-0">
           <table className="mt-4 w-full   min-w-max table-auto text-left">
             <thead>
               <tr>
@@ -106,8 +90,8 @@ const SubCategory = () => {
               </tr>
             </thead>
             <tbody>
-              {filterSubCat?.map((item, index) => {
-                const isLast = index === getSubCat.length - 1;
+              {filterData?.map((item, index) => {
+                const isLast = index === filterData.length - 1;
                 const classes = isLast
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
@@ -155,7 +139,7 @@ const SubCategory = () => {
                     </td>
 
                     <td
-                      onClick={() => HandleDelete(item?._id)}
+                      onClick={() =>{ HandleDelete(item)}}
                       className={classes}
                     >
                       <Tooltip content="Info User">
@@ -172,7 +156,7 @@ const SubCategory = () => {
         </CardBody>
       </Card>
       <AddSubCategoryModal />
-      <SubCatDeleteModal id={id} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <SubCatDeleteModal id={subCatid} isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   );
 };
@@ -194,8 +178,9 @@ export const SubCatDeleteModal = ({ id, isOpen, setIsOpen }) => {
   const dispatch = useDispatch();
   const handleClose = () => setIsOpen(false);
 
-  const handleDelete = () => {
+  const handleDeleteSubCat = () => {
     dispatch(DeleteSubCatApi(id));
+    handleClose()
   };
   return (
     <Modal
@@ -214,7 +199,7 @@ export const SubCatDeleteModal = ({ id, isOpen, setIsOpen }) => {
           <Button variant="outlined" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleDelete} >
+          <Button variant="contained" onClick={handleDeleteSubCat} >
             Delete
           </Button>
         </div>

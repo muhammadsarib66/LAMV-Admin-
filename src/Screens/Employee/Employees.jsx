@@ -1,10 +1,7 @@
-import {  useState } from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { PencilIcon, TrashIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { useEffect, useState } from "react";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   Card,
-  CardHeader,
-  Input,
   Typography,
   CardBody,
   Chip,
@@ -22,6 +19,7 @@ import {
 import { DeleteEmployyee } from "../../features/slicer/DeleteEmployeeSlicer";
 import AddEmployeeModal from "./AddEmployeeModal";
 import EmployeeDeleteModal from "../../component/EmployeeDeleteModal";
+import Header from "../../component/CardHeader";
 
 const Employees = () => {
   const dispatch = useDispatch();
@@ -29,8 +27,9 @@ const Employees = () => {
     (state) => state.GetEmployeeSlicer
   );
   const [userId, setUserId] = useState("");
-  const [filter, setFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filterData, setFilterData] = useState([]);
+  const [statusTab, setStatusTab] = useState("all");
+  const [search, setSearch] = useState("");
   const [delId, setDelId] = useState("");
   const TABLE_HEAD = [
     "Sr.No",
@@ -42,6 +41,20 @@ const Employees = () => {
     "Action",
   ];
 
+  const EmployeeStatusTABS = [
+    {
+      label: "All",
+      value: "all",
+    },
+    {
+      label: "Active",
+      value: "true",
+    },
+    {
+      label: "Blocked",
+      value: "false",
+    },
+  ];
   const handleAction = (id) => {
     setUserId(id);
     dispatch(setIsEmployeeActionModalOpen());
@@ -52,22 +65,24 @@ const Employees = () => {
     setDelId(id);
   };
 
-  // useEffect(() => {
-  //   // Fetch customers data when the component mounts
-  //   dispatch(getEmployeeApi());
-  // }, [dispatch]);
-  const filteredEmployees = getEmpolyees.filter((customer) => {
-    const isMatchFilter =
-      filter === "all" ||
-      (filter === "active" && customer.isActive === true) ||
-      (filter === "blocked" && customer.isActive === false);
-
-    const isMatchSearch =
-      customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.fullname.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return isMatchFilter && isMatchSearch;
-  });
+  useEffect(() => {
+    if (search.length > 0) {
+      const filteredData = getEmpolyees?.filter((data) => {
+        return data.username.toLowerCase().includes(search.toLowerCase());
+      });
+      setFilterData(filteredData);
+    } else {
+      // If search is cleared, reset filterData based on statusTab
+      const filteredData = getEmpolyees?.filter((data) => {
+        if (statusTab === "all") {
+          return true;
+        } else {
+          return data.isActive.toString() == statusTab;
+        }
+      });
+      setFilterData(filteredData);
+    }
+  }, [search, getEmpolyees, statusTab]);
 
   return (
     <>
@@ -75,46 +90,15 @@ const Employees = () => {
       <AddEmployeeModal />
       <ActionEmployeeModal userId={userId} />
 
-      <Card className="h-full w-full mb-10">
-        <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="mb-8 flex items-center justify-between gap-8">
-            <div>
-              <Typography variant="h5" color="blue-gray">
-                Employees List
-              </Typography>
-            </div>
-            <Button
-              onClick={() => dispatch(setisModalOpen())}
-              className="flex items-center gap-3"
-              size="sm"
-            >
-              <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Employee
-            </Button>
-          </div>
-
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <select
-              className="w-40 h-8  border-2 rounded-md  "
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            >
-              <option className=" " value="all">
-                All
-              </option>
-              <option value="active">Active</option>
-              <option value="blocked">Blocked</option>
-            </select>
-            <div className="w-full md:w-72">
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                label="Search"
-                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardBody className="  overflow-scroll    h-[70vh] px-0">
+      <Card className="h-full  pt-10 md:pt-0  w-full mb-10">
+        <Header
+          heading={"Employee List"}
+          headingDetail="See information about  Employee"
+          statusTabs={EmployeeStatusTABS}
+          setStatusTab={setStatusTab}
+          setSearch={setSearch}
+        />
+        <CardBody className="     h-[70vh]  overflow-auto px-0">
           <table className="mt-4 w-full   min-w-max table-auto text-left">
             <thead>
               <tr>
@@ -136,8 +120,8 @@ const Employees = () => {
             </thead>
             <tbody>
               {getEmpolyees &&
-                filteredEmployees?.map((item, index) => {
-                  const isLast = index === getEmpolyees?.length - 1;
+                filterData?.map((item, index) => {
+                  const isLast = index === filterData?.length - 1;
                   const classes = isLast
                     ? "p-4"
                     : "p-4 border-b border-blue-gray-50";

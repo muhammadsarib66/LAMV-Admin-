@@ -82,8 +82,9 @@ export default function ActionEmployeeModal({ userId }) {
 
           <Divider />
          <div className='flex justify-end gap-2'>
-         <Button disabled={userId?.isActive} onClick={handleActive}  variant='outlined'>Active</Button>
-         <Button  disabled={userId?.isBlocked} onClick={handleBlock} variant='standard'>block</Button>
+          {
+            userId?.isActive ? <Button onClick={handleBlock} variant='standard'>block</Button> : <Button onClick={handleActive} variant='outlined'>Unblock</Button>
+          }
          </div>
          
 

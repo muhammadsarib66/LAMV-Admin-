@@ -33,13 +33,12 @@ const Dashboard = () => {
   ];
 
   return (
-    <section>
-      Dashboard
+    <section className="p-4">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         {Cards.map((item, index) => (
           <div
             key={index}
-            className="hover:bg-gray-200 cursor-pointer flex items-center justify-between shadow-lg p-4 rounded-md "
+            className="hover:bg-gray-200 bg-white hover:scale-110 duration-300 transition ease-linear cursor-pointer flex items-center justify-between shadow-lg p-4 rounded-md "
           >
             <div className=" ">
               <h1 className=" pb-4 text-2xl font-bold text-gray-800">

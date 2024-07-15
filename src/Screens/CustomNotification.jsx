@@ -1,16 +1,15 @@
 import { Textarea, Button, Input ,Card,
   CardBody,
   CardFooter,
-  Typography, } from "@material-tailwind/react";
+ } from "@material-tailwind/react";
 import AnimatedMulti from "../component/AnimatedMulti";
 import { useSelector } from "react-redux";
 
 function CustomNotification() {
   const { getEmpolyees } = useSelector((state) => state.GetEmployeeSlicer);
-  console.log(getEmpolyees);
   return (
-    <section className="ml-2 grid grid-cols-1 md:grid-cols-5 gap-4 md:w-[94%]">
-      <div className="md:col-span-3 rounded-lg border p-4 shadow-lg h-fit shadow-purple-200 ">
+    <section className="p-4 grid grid-cols-1 md:grid-cols-5 gap-4 h-screen place-items-center   md:w-full">
+      <div className="md:col-span-3 rounded-lg border p-4 shadow-lg h-fit w-full  overflow-auto bg-white shadow-purple-200 ">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">
             {" "}
@@ -51,33 +50,36 @@ function CustomNotification() {
           </div>
         </div>
       </div>
-      <div className="md:col-span-2 p-2 shadow-lg  rounded-lg  flex flex-col gap-4 h-screen overflow-y-scroll border shadow-purple-200 ">
+      <div className="md:col-span-2 p-2  pt-8  flex flex-col gap-4 h-screen   overflow-y-auto ">
         <h1>
           {" "}
           <span className="text-2xl font-bold text-gray-800">Notification</span>{" "}
         </h1>
-      {[1,2,3,4].map((item,ind)=>(
-      <Card key={ind} className=" bg-gray-200 w-full h-fit ">
+        <div className="overflow-y-auto flex flex-col gap-4 ">
+
+      {[1,2,3,4,5,6].map((item,ind)=>(
+      <Card key={ind} className=" bg-white w-full min-h-[200px] max-h-[400px] overflow-y-auto ">
       <CardBody>
         <div className="flex justify-between items-center mb-2">
 
-        <Typography variant="h5" color="blue-gray" className="mb-2">
+        <p  className="text-lg font-bold capitalize">
           Title 
-        </Typography>
+        </p>
         <span>
           <i className="fas fa-xmark text-green-500 mr-2"></i> 
         </span>
         </div>
-        <Typography>
+        <p className="text-xs">
           The place is close to Barceloneta Beach and bus stop just 2 min by
           walk and near to &quot;Naviglio&quot; where you can enjoy the main
           night life in Barcelona.
-        </Typography>
+        </p>
       </CardBody>
       <CardFooter className="pt-0">
-        <Button color="amber">sent notification to 5 person</Button>
+        <Button className="w-fit text-xs" color="amber">sent notification to 5 person</Button>
       </CardFooter>
     </Card>))}
+    </div>
 
       </div>
     </section>
